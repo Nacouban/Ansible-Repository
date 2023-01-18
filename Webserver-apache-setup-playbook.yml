@@ -1,0 +1,63 @@
+- name: Setting up apache webserver on amazon linux servers
+  hosts: amazon-nodes
+
+  tasks:
+    - name: Upgrade all packages on the servers #yum update -y
+      ansible.builtin.yum:
+        name: '*'
+        state: latest
+    - name: Install the latest version of Apache # yum install httpd -y
+      ansible.builtin.yum:
+        name: httpd
+        state: latest
+    - name: Start service httpd, if not started # systemctl start httpd
+      ansible.builtin.service:
+        name: httpd
+        state: started
+    - name: Enable service httpdat server launch # systemctl enable http
+      ansible.builtin.service:
+        name: httpd
+        enabled: yes
+    - name: Copy file index.html from the controller to the nodes at /var/www/html
+      ansible.builtin.copy:
+        src: /root/web/index.html
+        dest: /var/www/html/
+
+    - name: Install git
+      yum:
+        name: git
+        state: present
+        update_cache: yes
+
+# Play2 to install apache on ubuntu-nodes
+
+- name: Setting up apache webserver on amazon linux servers
+  hosts: ubuntu-nodes
+
+  tasks:
+    - name: Update all packages to their latest version
+      ansible.builtin.apt:
+        name: "*"
+        state: latest
+    - name: Install apache httpd  (state=present is optional)
+      ansible.builtin.apt:
+        name: apache2
+        state: present        
+    - name: Start service httpd, if not started # systemctl start httpd
+      ansible.builtin.service:
+        name: apache2
+        state: started
+    - name: Enable service httpdat server launch # systemctl enable http
+      ansible.builtin.service:
+        name: apache2
+        enabled: yes
+    - name: Copy file index.html from the controller to the nodes at /var/www/html
+      ansible.builtin.copy:
+        src: /root/webserver/index.html
+        dest: /var/www/html/
+
+    - name: Install git
+      apt:
+        name: git
+        state: present
+        update_cache: yes
